@@ -21,6 +21,7 @@ BMI <- read_csv('/Users/theodorymm/downloads/cdc_data.csv')
 diagnosis <- read_csv('/Users/theodorymm/downloads/Diagnoses.csv')
 
 #Renaming column names, and subsetting data
+impairment <- impairment %>% rename(ID = EID)
 
 diagnosis <- diagnosis %>% rename(ID = EID)
 diagnosis <- diagnosis[-c(1:7, 13, 25:26, 29, 44, 90:158)]
@@ -32,7 +33,7 @@ ethnicity <- subset(ethnicity, select=c(`PreInt_Demos_Fam,Child_CountryOrigin`, 
 names(ethnicity)[5] <- "ID"
 
 names(BMI)[33] <- "ID"
-BMI <- subset(BMI, select=c(ID, weight, height, bmi, wapct, waz, haz, hapct, bmipct, bmiz, bivwt))
+BMI <- subset(BMI, select=c(ID, weight, height, bmi, wapct, waz, haz, hapct, bmipct, bmiz))
 
 demo <- demo %>% rename(ID = EID)
 demo <- demo%>% dplyr::select(ID, Age, Sex)
@@ -91,7 +92,7 @@ plotdata$black <- as.numeric(plotdata$`PreInt_Demos_Fam,Child_Ethnicity`!=1 & pl
 plotdata$other <- as.numeric(plotdata$`PreInt_Demos_Fam,Child_Ethnicity`!= 1 & c(plotdata$`PreInt_Demos_Fam,Child_Race`==3 | plotdata$`PreInt_Demos_Fam,Child_Race`==4 | plotdata$`PreInt_Demos_Fam,Child_Race`== 5 | plotdata$`PreInt_Demos_Fam,Child_Race`==6 | plotdata$`PreInt_Demos_Fam,Child_Race`==7 | plotdata$`PreInt_Demos_Fam,Child_Race`== 8 | plotdata$`PreInt_Demos_Fam,Child_Race`==9 |plotdata$`PreInt_Demos_Fam,Child_Race`== 10 | plotdata$`PreInt_Demos_Fam,Child_Race`== 11)) 
 plotdata$hi <- paste(plotdata$hisp, plotdata$white, plotdata$black, plotdata$other, sep = ",")
 plotdata$hi <- as.factor(plotdata$hi)
-plotdata$ethnic <- droplevels(x=plotdata$hi, exclude =  c("NA,0,NA,0", "0,NA,NA,NA", "NA,NA,0,0", "NA,NA,NA,NA"))
+plotdata$ethnic <- droplevels(x=plotdata$hi, exclude =  c("NA,0,NA,0", "0,NA,NA,NA", "NA,NA,0,0", "NA,NA,NA,NA", "NA,0,0,NA"))
 levels(plotdata$ethnic) <- c("Other", "Non-Hispanic Black", "Non-Hispanic White", "Hispanic")
 
 #Looking at three psychiatric diagnoses and scoring them 
@@ -100,23 +101,19 @@ plotdata$anxiety <- apply(plotdata[,cats], 1, function(x)as.integer(any(grep("An
 plotdata$depression <- apply(plotdata[,cats],1, function(x)as.integer(any(grep("Depressive Disorders",x))))
 plotdata$bipolar <- apply(plotdata[,cats], 1, function(x)as.integer(any(grep("Bipolar and Related Disorders",x))))
 
+
 #Splitting data by sex now
 girlsplotdata <- subset(plotdata, plotdata$Sex=="Females")
 boysplotdata<- subset(plotdata, plotdata$Sex=="Males")
 
 #One spline regression modelling example of moderate-to-vigorous physical activity duration for males (based on checking whether linear fit or nonlinear fit was better for each model -- not shown here, available by request):
 
-#First, centering age variable through created function 
-center_scale <- function(x) {
-  scale(x, scale = FALSE)
-}
-
-boysplotdata$Age <- center_scale(boysplotdata$Age)
 nonlinearmvpamales <- gam(dur_day_total_MVPA ~ s(Age, bs="cr", k=15) + depression + PPS_M_04 + CIS_P_Scorev2 + wapct, data=boysplotdata, method="REML")
+summary(nonlinearmvpamales)
 
 #Creating plot for males, as an example
 aind <- seq(5,20,len=100)
-df_pred_M <- expand.grid("Age"=aind, "PPS_M_04"=levels(girlsplotdata$PPS_M_04))
+df_pred_M <- expand.grid("Age"=aind, "PPS_M_04"=levels(boysplotdata$PPS_M_04))
 
 #Since not all pubertal categories are observed in all age ranges, subset to the 5th and 95th percentile of age in each category for plotting 
 df_age_pps_qs_M <- 
@@ -131,7 +128,8 @@ df_pred_M <-
   dplyr::select(-q05,-q95) %>% 
   mutate(wapct = 0, 
          CIS_P_Scorev2 = 0, 
-         ethnic = levels(boysplotdata$ethnic)[1])
+         ethnic = levels(boysplotdata$ethnic)[1],
+         depression== "0")
 
 #Predict average MVPA during the day at each pubertal score and add it to the dataframe we just created
 fhat_mac_M <- predict(nonlinearmvpamales, newdata=df_pred_M, type='response',se.fit=TRUE)
@@ -140,19 +138,22 @@ df_pred_M$yhat <- fhat_mac_M$fit
 #Add in 95% CIs
 df_pred_M$UB <- fhat_mac_M$fit + 1.96*fhat_mac_M$se.fit
 df_pred_M$LB <- fhat_mac_M$fit - 1.96*fhat_mac_M$se.fit
-#Make the plot
+
+#Make the plot (not including lower and upper CI bounds here for visual purposes)
 plt_M <- 
   df_pred_M %>% 
   dplyr::select(Age, PPS_M_04, yhat, UB, LB) %>% 
   mutate(PPS_M_04 = factor(PPS_M_04, levels=2:5, labels=c("Level 1","Level 2","Level 3","Level 4"))) %>% 
   ggplot() + 
   geom_line(aes(x=Age,y=yhat, group=PPS_M_04, color=PPS_M_04)) +
-  geom_line(aes(x=Age,y=LB, group=PPS_M_04, color=PPS_M_04),lty=2) +
-  geom_line(aes(x=Age,y=UB, group=PPS_M_04, color=PPS_M_04),lty=2) +
-  theme_classic() + ylab("[OR INSERT YOUR Y-AXIS LABEL]") + 
+  #geom_line(aes(x=Age,y=LB, group=PPS_M_04, color=PPS_M_04),lty=2) +
+  #geom_line(aes(x=Age,y=UB, group=PPS_M_04, color=PPS_M_04),lty=2) +
+  theme_classic() + ylab("[INSERT YOUR Y-AXIS LABEL]") + 
   ggtitle("(A) Boys [INSERT YOUR PLOT TITLE]") +
-  labs(color="Pubertal Status \n [make these labels informative]") + 
-  theme(legend.position = c(0.8, 0.8)) + ylim(20,80) + xlim(5,20)
+  labs(color="Pubertal Status \n [insert labels]") +  
+  theme(legend.position = c(0.8, 0.8)) + xlim(5,21)
+
+plt_M
 
 ggsave(here::here(figure_path, "michelle_example_plot.jpeg"))
       
