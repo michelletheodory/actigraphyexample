@@ -1,6 +1,6 @@
 ---
 title: "Example Code"
-output: rmarkdown::github_document
+output:: html
 ---
 library(psych)
 library(gamlss)
@@ -160,5 +160,8 @@ plt_M
 
 ggsave(here::here(figure_path, "michelle_example_plot.jpeg"))
       
+
+
+
 
 
