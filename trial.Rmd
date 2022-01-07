@@ -2,7 +2,9 @@
 title: "Example Code"
 author: "Michelle Theodory"
 date: "1/7/2022"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -16,6 +18,11 @@ library(tidyverse)
 library(knitr)
 library(here)
 library(mgcv)
+library(sjPlot)
+library(sjmisc)
+library(sjlabelled)
+library(xtable)
+
 
 ## Set path for saving figures 
 figure_path <- "~/Desktop"
@@ -120,9 +127,10 @@ boysplotdata<- subset(plotdata, plotdata$Sex=="Males")
 ##One spline regression modelling example of moderate-to-vigorous physical activity duration for males (based on checking whether linear fit or nonlinear fit was better for each model -- not shown here, available by request):
 
 nonlinearmvpamales <- gam(dur_day_total_MVPA ~ s(Age, bs="cr", k=15) + depression + PPS_M_04 + CIS_P_Scorev2 + wapct, data=boysplotdata, method="REML")
+output <- summary(nonlinearmvpamales)
 
-```{r}
-summary(nonlinearmvpamales)
+```{r nonlinearmvpamales, echo=TRUE, warning=FALSE}
+output
 ```
 
 ##Creating plot for males, as an example
@@ -167,9 +175,10 @@ plt_M <-
   labs(color="Pubertal Status \n [insert labels]") +  
   theme(legend.position = c(0.8, 0.8)) + xlim(5,21)
 
-```{r plt_M, echo=FALSE}
+```{r plt_M, echo=TRUE}
 plt_M
 ```
 ggsave(here::here(figure_path, "michelle_example_plot.jpeg"))
       
+
 
