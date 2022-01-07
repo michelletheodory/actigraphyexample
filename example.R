@@ -1,4 +1,4 @@
-#Georgetown example code:
+#Example code:
 library(psych)
 library(gamlss)
 library(tidyverse)
