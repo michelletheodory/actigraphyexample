@@ -1,9 +1,9 @@
 {
     "id": "1C539D72",
-    "path": "~/Desktop/actigraphyexample/trial.Rmd",
-    "project_path": "trial.Rmd",
+    "path": "~/Desktop/actigraphyexample/examplecode.Rmd",
+    "project_path": "examplecode.Rmd",
     "type": "r_markdown",
-    "hash": "2809612274",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1641571585113.0,
@@ -13,16 +13,16 @@
         "tempName": "Untitled1",
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "127,0",
-        "scrollLine": "127",
-        "last_setup_crc32": "463ABCFAc4e2d899"
+        "cursorPosition": "7,3",
+        "scrollLine": "2",
+        "last_setup_crc32": ""
     },
     "folds": "",
-    "lastKnownWriteTime": 1641574616,
+    "lastKnownWriteTime": 1641647718,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1641574618936,
+    "last_content_update": 1641647718849,
     "read_only": false,
     "read_only_alternatives": []
 }
