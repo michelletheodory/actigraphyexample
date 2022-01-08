@@ -2,7 +2,9 @@
 title: "Example Code"
 author: "Michelle Theodory"
 date: "1/7/2022"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 Loading in appropriate packages:
 ```{r, results=FALSE, warning=FALSE, message=FALSE}
@@ -12,10 +14,6 @@ library(tidyverse)
 library(knitr)
 library(here)
 library(mgcv)
-library(sjPlot)
-library(sjmisc)
-library(sjlabelled)
-library(xtable)
 ```
 
 Setting path for saving figures: 
