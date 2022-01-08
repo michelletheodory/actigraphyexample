@@ -2,39 +2,29 @@
 title: "Example Code"
 author: "Michelle Theodory"
 date: "1/7/2022"
-<<<<<<< HEAD
-output:
-  html_document: default
-  pdf_document: default
-=======
 output: html_document
->>>>>>> f64510cbf9a7145f268ffd0fca7fe3bebb5cdcf7
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
-```
-
-#Example code:
+Loading in appropriate packages:
+```{r, results=FALSE, warning=FALSE, message=FALSE}
 library(psych)
 library(gamlss)
 library(tidyverse)
 library(knitr)
 library(here)
 library(mgcv)
-<<<<<<< HEAD
 library(sjPlot)
 library(sjmisc)
 library(sjlabelled)
 library(xtable)
+```
 
-=======
->>>>>>> f64510cbf9a7145f268ffd0fca7fe3bebb5cdcf7
-
-## Set path for saving figures 
+Setting path for saving figures: 
+```{r}
 figure_path <- "~/Desktop"
+```
 
-##Loading in example data
+Loading in example data:
+```{r, echo=TRUE, results=FALSE, warning=FALSE, message=FALSE}
 personsum <- read_csv('~theodorymm/downloads/personsummary.csv')
 daysum <- read_csv('~theodorymm/downloads/daysummary.csv')
 pubertal_m <- read_csv('/Users/theodorymm/downloads/malepuberty.csv', na = c('NULL'))
@@ -44,8 +34,11 @@ demo <- read_csv('/Users/theodorymm/downloads/demos.csv')
 ethnicity <- read_csv('/Users/theodorymm/Downloads/moredemos.csv')
 BMI <- read_csv('/Users/theodorymm/downloads/cdc_data.csv')
 diagnosis <- read_csv('/Users/theodorymm/downloads/Diagnoses.csv')
+```
 
-##Renaming column names, and subsetting data
+Renaming column names and subsetting data:
+
+```{r}
 impairment <- impairment %>% rename(ID = EID)
 
 diagnosis <- diagnosis %>% rename(ID = EID)
@@ -66,10 +59,12 @@ demo <- demo%>% dplyr::select(ID, Age, Sex)
 plotdata <- personsum %>% dplyr::select(ID, ACC_day_mg_pla, dur_day_total_IN_min_pla, dur_day_total_LIG_min_pla,
                                         dur_day_total_MOD_min_pla, dur_day_total_VIG_min_pla,  dur_spt_sleep_min_pla, sleep_efficiency_pla, L5TIME_num_wei, M10TIME_num_wei, M5TIME_num_wei, L10TIME_num_wei)
 
-##creating MVPA variable
 plotdata <- plotdata %>% mutate(dur_day_total_MVPA = dur_day_total_MOD_min_pla + dur_day_total_VIG_min_pla)
+```
 
-##join demographic, pubertal status, impairment, BMI, and ethnicity data to activity/actigraphy data
+Merging the data, renaming/scoring and creating appropriate variables, and some data cleaning:
+
+```{r}
 plotdata <- merge(plotdata, pubertal, by="ID", all.x=TRUE) 
 plotdata <- merge(plotdata, demo, by="ID", all.x=TRUE)
 plotdata <- merge(plotdata, BMI, by= "ID", all.x=TRUE)
@@ -77,7 +72,6 @@ plotdata <- left_join(plotdata, ethnicity, by = "ID", all=T)
 plotdata <- left_join(plotdata, impairment, by="ID", all=T)
 plotdata <- merge(plotdata, diagnosis, by="ID", all.x=TRUE)
 
-##rescoring peterson pubertal scale
 plotdata <- plotdata %>%
   mutate(PPS_M_Score = ifelse(PPS_M_Score == 3, 1, 
                               ifelse(PPS_M_Score %in% c(4,5), 2,
@@ -86,13 +80,8 @@ plotdata <- plotdata %>%
                                                    ifelse(PPS_M_Score == 12, 5, NA))))),
          PPS_Score_Combined = ifelse(is.na(PPS_M_Score), PPS_F_Score, PPS_M_Score))
 
-##Looking at missing data and subsetting accordingly now 
-##here taking away data that is missing Sex data, for example
-
 missing_demo <- plotdata %>% filter(is.na(Sex))
 plotdata <- filter(plotdata, ! ID %in% missing_demo$ID)
-
-##Exploratory analyses & renaming more variables (have not included all exploratory here)
 
 plotdata$Sex <- as.factor(plotdata$Sex)
 levels(plotdata$Sex) <- c("Males", "Females")
@@ -108,9 +97,11 @@ plotdata <-
          pubertal_combined = ifelse(Sex == "Males", PPS_M_fac, PPS_F_fac))
 
 levels(plotdata$pubertal_combined) <- c("Without Menarche", "With Menarche", "No Voice Change", "Voice Change Barely Begun", "Voice Change Definitely Underway", "Voice Change Seems Completed")
+```
 
+Here, I am creating a combined race/ethnicity variable: 
 
-##Creating combined ethnicity variable
+```{r}
 plotdata$hisp <- as.numeric(plotdata$`PreInt_Demos_Fam,Child_Ethnicity`==1)
 plotdata$white <- as.numeric(plotdata$`PreInt_Demos_Fam,Child_Ethnicity`!=1 & plotdata$`PreInt_Demos_Fam,Child_Race`==0)
 plotdata$black <- as.numeric(plotdata$`PreInt_Demos_Fam,Child_Ethnicity`!=1 & plotdata$`PreInt_Demos_Fam,Child_Race`==1)
@@ -119,34 +110,34 @@ plotdata$hi <- paste(plotdata$hisp, plotdata$white, plotdata$black, plotdata$oth
 plotdata$hi <- as.factor(plotdata$hi)
 plotdata$ethnic <- droplevels(x=plotdata$hi, exclude =  c("NA,0,NA,0", "0,NA,NA,NA", "NA,NA,0,0", "NA,NA,NA,NA", "NA,0,0,NA"))
 levels(plotdata$ethnic) <- c("Other", "Non-Hispanic Black", "Non-Hispanic White", "Hispanic")
+```
 
-##Looking at three psychiatric diagnoses and scoring them 
+Here, I am looking at three psychiatric diagnoses and scoring them accordingly:
+
+```{r}
 cats = c("DX_01_Cat", "DX_02_Cat", "DX_03_Cat", "DX_04_Cat", "DX_05_Cat")
 plotdata$anxiety <- apply(plotdata[,cats], 1, function(x)as.integer(any(grep("Anxiety Disorders",x))))
 plotdata$depression <- apply(plotdata[,cats],1, function(x)as.integer(any(grep("Depressive Disorders",x))))
 plotdata$bipolar <- apply(plotdata[,cats], 1, function(x)as.integer(any(grep("Bipolar and Related Disorders",x))))
-
-
-##Splitting data by sex now
-girlsplotdata <- subset(plotdata, plotdata$Sex=="Females")
-boysplotdata<- subset(plotdata, plotdata$Sex=="Males")
-
-##One spline regression modelling example of moderate-to-vigorous physical activity duration for males (based on checking whether linear fit or nonlinear fit was better for each model -- not shown here, available by request):
-
-nonlinearmvpamales <- gam(dur_day_total_MVPA ~ s(Age, bs="cr", k=15) + depression + PPS_M_04 + CIS_P_Scorev2 + wapct, data=boysplotdata, method="REML")
-<<<<<<< HEAD
-output <- summary(nonlinearmvpamales)
-
-```{r nonlinearmvpamales, echo=TRUE, warning=FALSE}
-output
-=======
-
-```{r}
-summary(nonlinearmvpamales)
->>>>>>> f64510cbf9a7145f268ffd0fca7fe3bebb5cdcf7
 ```
 
-##Creating plot for males, as an example
+Splitting the data by sex:
+```{r}
+girlsplotdata <- subset(plotdata, plotdata$Sex=="Females")
+boysplotdata<- subset(plotdata, plotdata$Sex=="Males")
+```
+
+This is an example of one spline regression modelling of moderate-to-vigorous physical activity duration for males (based on checking whether linear fit or nonlinear fit was better for each model -- not shown here, available by request):
+
+```{r}
+nonlinearmvpamales <- gam(dur_day_total_MVPA ~ s(Age, bs="cr", k=15) + depression + PPS_M_04 + CIS_P_Scorev2 + wapct, data=boysplotdata, method="REML")
+output <- summary(nonlinearmvpamales)
+output
+```
+
+Creating a plot demonstrating males' MVPA, as an example: 
+
+```{r}
 aind <- seq(5,20,len=100)
 df_pred_M <- expand.grid("Age"=aind, "PPS_M_04"=levels(boysplotdata$PPS_M_04))
 
@@ -183,22 +174,19 @@ plt_M <-
   geom_line(aes(x=Age,y=yhat, group=PPS_M_04, color=PPS_M_04)) +
   #geom_line(aes(x=Age,y=LB, group=PPS_M_04, color=PPS_M_04),lty=2) +
   #geom_line(aes(x=Age,y=UB, group=PPS_M_04, color=PPS_M_04),lty=2) +
-  theme_classic() + ylab("[INSERT YOUR Y-AXIS LABEL]") + 
-  ggtitle("(A) Boys [INSERT YOUR PLOT TITLE]") +
+  theme_classic() + ylab("[insert y-axis label]") + 
+  ggtitle("(A) Boys [insert plot title]") +
   labs(color="Pubertal Status \n [insert labels]") +  
   theme(legend.position = c(0.8, 0.8)) + xlim(5,21)
+```
 
-<<<<<<< HEAD
-```{r plt_M, echo=TRUE}
-=======
-```{r plt_M, echo=FALSE}
->>>>>>> f64510cbf9a7145f268ffd0fca7fe3bebb5cdcf7
+```{r, echo=FALSE}
 plt_M
 ```
+
+
+Code to save my plot:
+
+```{r, results=FALSE, message=FALSE}
 ggsave(here::here(figure_path, "michelle_example_plot.jpeg"))
-      
-
-<<<<<<< HEAD
-
-=======
->>>>>>> f64510cbf9a7145f268ffd0fca7fe3bebb5cdcf7
+```
