@@ -1,0 +1,2 @@
+# Actigraphy-Example
+Here, you can find an html document containing example code. This code pertains to a project looking at actigraph-measured physical activity across age and pubertal development. This is done while controlling for weight-for age percentile, race/ethnicity, CIS impairment, psychiatric diagnoses (having depression or not), and sex. One-spline regression modeling is used, and a plot is shown. 
