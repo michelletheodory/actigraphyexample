@@ -186,14 +186,14 @@ library(xtable)</code></pre>
 <pre class="r"><code>figure_path &lt;- &quot;~/Desktop&quot;</code></pre>
 <p>Loading in example data:</p>
 <pre class="r"><code>personsum &lt;- read_csv(&#39;~theodorymm/downloads/personsummary.csv&#39;)
-daysum &lt;- read_csv(&#39;~theodorymm/downloads/daysummary.csv&#39;)
-pubertal_m &lt;- read_csv(&#39;/Users/theodorymm/downloads/malepuberty.csv&#39;, na = c(&#39;NULL&#39;))
-pubertal_f &lt;- read_csv(&#39;/Users/theodorymm/downloads/femalepuberty.csv&#39;, na = c(&#39;NULL&#39;))
-impairment &lt;- read_csv(&#39;/Users/theodorymm/Downloads/CIS_score.csv&#39;)
-demo &lt;- read_csv(&#39;/Users/theodorymm/downloads/demos.csv&#39;)
-ethnicity &lt;- read_csv(&#39;/Users/theodorymm/Downloads/moredemos.csv&#39;)
-BMI &lt;- read_csv(&#39;/Users/theodorymm/downloads/cdc_data.csv&#39;)
-diagnosis &lt;- read_csv(&#39;/Users/theodorymm/downloads/Diagnoses.csv&#39;)</code></pre>
+daysum &lt;- read_csv(&#39;~insertusername/downloads/daysummary.csv&#39;)
+pubertal_m &lt;- read_csv(&#39;/Users/insertusername/downloads/malepuberty.csv&#39;, na = c(&#39;NULL&#39;))
+pubertal_f &lt;- read_csv(&#39;/Users/insertusername/downloads/femalepuberty.csv&#39;, na = c(&#39;NULL&#39;))
+impairment &lt;- read_csv(&#39;/Users/insertusername/Downloads/CIS_score.csv&#39;)
+demo &lt;- read_csv(&#39;/Users/insertusername/downloads/demos.csv&#39;)
+ethnicity &lt;- read_csv(&#39;/Users/insertusername/Downloads/moredemos.csv&#39;)
+BMI &lt;- read_csv(&#39;/Users/insertusername/downloads/cdc_data.csv&#39;)
+diagnosis &lt;- read_csv(&#39;/Users/insertusername/downloads/Diagnoses.csv&#39;)</code></pre>
 <p>Renaming column names and subsetting data:</p>
 <pre class="r"><code>impairment &lt;- impairment %&gt;% rename(ID = EID)
 
