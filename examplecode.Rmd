@@ -23,15 +23,15 @@ figure_path <- "~/Desktop"
 
 Loading in example data:
 ```{r, echo=TRUE, results=FALSE, warning=FALSE, message=FALSE}
-personsum <- read_csv('~theodorymm/downloads/personsummary.csv')
-daysum <- read_csv('~theodorymm/downloads/daysummary.csv')
-pubertal_m <- read_csv('/Users/theodorymm/downloads/malepuberty.csv', na = c('NULL'))
-pubertal_f <- read_csv('/Users/theodorymm/downloads/femalepuberty.csv', na = c('NULL'))
-impairment <- read_csv('/Users/theodorymm/Downloads/CIS_score.csv')
-demo <- read_csv('/Users/theodorymm/downloads/demos.csv')
-ethnicity <- read_csv('/Users/theodorymm/Downloads/moredemos.csv')
-BMI <- read_csv('/Users/theodorymm/downloads/cdc_data.csv')
-diagnosis <- read_csv('/Users/theodorymm/downloads/Diagnoses.csv')
+personsum <- read_csv('~insertusername/downloads/personsummary.csv')
+daysum <- read_csv('~insertusername/downloads/daysummary.csv')
+pubertal_m <- read_csv('/Users/insertusername/downloads/malepuberty.csv', na = c('NULL'))
+pubertal_f <- read_csv('/Users/insertusername/downloads/femalepuberty.csv', na = c('NULL'))
+impairment <- read_csv('/Users/insertusername/Downloads/CIS_score.csv')
+demo <- read_csv('/Users/insertusername/downloads/demos.csv')
+ethnicity <- read_csv('/Users/insertusername/Downloads/moredemos.csv')
+BMI <- read_csv('/Users/insertusername/downloads/cdc_data.csv')
+diagnosis <- read_csv('/Users/insertusername/downloads/Diagnoses.csv')
 ```
 
 Renaming column names and subsetting data:
